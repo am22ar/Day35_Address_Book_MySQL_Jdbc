@@ -12,7 +12,7 @@ import java.util.List;
 public class AddressBook {
 	Connection connection;
 
-	private Connection getConnection() {
+	private static Connection getConnection() {
 		Connection connection = null;
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
@@ -55,6 +55,34 @@ public class AddressBook {
 		return addressBookList;
 
 	}
+	
+	 public static void insertData(Contacts add) throws SQLException {
+	        Connection connection = getConnection();
+	        try {
+	            if (connection != null) {
+	                connection.setAutoCommit(false);
+	                Statement statement = connection.createStatement();
+	                String sql = "insert into address_book_db(firstname,lastname,address,city,state,zipcode,mobilenum,email,bookname,dateadded)" +
+	                        "values('" + add.getFirstName() + "','" + add.getLastName() + "','" + add.getAddress() + "','" + add.getCity() +
+	                        "','" + add.getState() + "','" + add.getZip() + "','" + add.getPhoneNumber() + "','" +
+	                        add.getEmailId() + "','" + add.getBookName() + "','" + add.getDateAdded() + "');";
+	                int result = statement.executeUpdate(sql);
+	                connection.commit();
+	                if (result > 0) {
+	                    System.out.println("Contact Inserted");
+	                }
+	                connection.setAutoCommit(true);
+	            }
+	        } catch (SQLException sqlException) {
+	            System.out.println("Insertion Rollbacked");
+	            connection.rollback();
+	        } finally {
+	            if (connection != null) {
+	                connection.close();
+	            }
+	        }
+	    }
+	
 	public void updateCityByZip(String address, String city, String state, int zip, int id) {
         try (Connection connection = getConnection()) {
             Statement statement = connection.createStatement();
