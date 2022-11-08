@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,4 +68,32 @@ public class AddressBook {
             e.printStackTrace();
         }
     }
+	   public List<Contacts> findAllForParticularDate(LocalDate date) {
+	        ResultSet resultSet = null;
+	        List<Contacts> addressBookList = new ArrayList<Contacts>();
+	        try (Connection connection = getConnection()) {
+	            Statement statement = connection.createStatement();
+	            String sql = "select * from address_book_db where dateadded between cast(' "+ date + "'" +" as date)  and date(now());";
+	            resultSet = statement.executeQuery(sql);
+	            int count = 0;
+	            while (resultSet.next()) {
+	                Contacts contactInfo = new Contacts();
+	                contactInfo.setFirstName(resultSet.getString("firstName"));
+	                contactInfo.setLastName(resultSet.getString("lastname"));
+	                contactInfo.setAddress(resultSet.getString("address"));
+	                contactInfo.setCity(resultSet.getString("city"));
+	                contactInfo.setState(resultSet.getString("state"));
+	                contactInfo.setZip(resultSet.getInt("zipcode"));
+	                contactInfo.setPhoneNumber(resultSet.getString("mobilenum"));
+	                contactInfo.setEmailId(resultSet.getString("email"));
+	                contactInfo.setBookName(resultSet.getString("bookname"));
+	                contactInfo.setDateAdded(resultSet.getDate("dateadded").toLocalDate());
+
+	                addressBookList.add(contactInfo);
+	            }
+	        } catch (SQLException e) {
+	            System.out.println(e);
+	        }
+	        return addressBookList;
+	    }
 }
